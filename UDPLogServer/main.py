@@ -1,4 +1,4 @@
-#!/user/bin/env python3
+#!/usr/bin/env python3
 import sys
 import json
 import struct
@@ -11,7 +11,7 @@ path_to_file = ""
 class Ui(QtWidgets.QMainWindow):
     def __init__(self):
         super().__init__()
-        uic.loadUi("udp 2.0/user_interface.ui", self)
+        uic.loadUi("UDPLogServer/user_interface.ui", self)
                                   
         #buttons and checkboxes
         self.open_file_browser.clicked.connect(self.open_file)
