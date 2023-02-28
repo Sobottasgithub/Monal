@@ -3,7 +3,6 @@ import sys
 import json
 import struct
 from PyQt5 import QtWidgets, uic, QtGui
-from interpreter import Hello_world
 
 entrys = []
 filter_list = []
@@ -174,9 +173,7 @@ class Ui(QtWidgets.QMainWindow):
             pass # ERROR
 
     def code_input_submit_(self):
-        
-        Hello_world()
-
+        print("Hello World!")
 
 app = QtWidgets.QApplication(sys.argv)
 window = Ui()
