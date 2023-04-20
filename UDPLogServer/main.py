@@ -1,8 +1,13 @@
-#!/usr/bin/env python3
+#!/usr/bin/python3
+
+#MONAL LOG VIEWER (MLV)
+
 import sys
 import json
 import struct
+import os
 from PyQt5 import QtWidgets, uic, QtGui
+from internals.interpreter import run
 
 entrys = []
 filter_list = []
@@ -11,17 +16,32 @@ path_to_file = ""
 class Ui(QtWidgets.QMainWindow):
     def __init__(self):
         super().__init__()
-        uic.loadUi("UDPLogServer/user_interface.ui", self)
+        uifile = os.path.join(os.path.dirname(sys.argv[0]), "user_interface.ui")
+        uic.loadUi(uifile, self)
+        self.setWindowTitle("MONAL LOG VIEWER")
+        self.setWindowIcon(QtGui.QIcon(os.path.join(os.path.dirname(sys.argv[0]), "monal_udp_viewer.png")))
                                   
         #buttons and checkboxes
         self.open_file_browser.clicked.connect(self.open_file)
         self.search_input_submit.clicked.connect(self.search_input_submit_)
-        self.code_input_submit.clicked.connect(self.code_input_submit_)
+        self.settings_button.clicked.connect(self.settings_submit_)
+        #self.code_input_submit.clicked.connect(self.code_input_submit_)
 
         #text-input
         self.search_input = self.findChild(QtWidgets.QLineEdit, 'search_input')
         self.code_input = self.findChild(QtWidgets.QLineEdit, 'code_input')
 
+    def calcColor(self, flag):
+        if int(flag) == 1: #error
+            return (QtGui.QColor(255, 111, 102), QtGui.QColor(0, 0, 0)) # red | black
+        elif int(flag) == 2: #warning
+            return (QtGui.QColor(254,134,0), QtGui.QColor(0, 0, 0)) # orange | black
+        elif int(flag) == 4: #info
+            return (QtGui.QColor(0,214,0), None) # green | white
+        elif int(flag) == 8: #debug
+            return (QtGui.QColor(1,175,255), None) # blue | white
+        elif int (flag) == 16: #verbose
+            return (QtGui.QColor(148, 149, 149), None) # grey | white
 
     #This function filters all entrys that are written in the listview
     def filter_color_and_display(self, entry_i):
@@ -29,41 +49,14 @@ class Ui(QtWidgets.QMainWindow):
         global filter_list
         global path_to_file
 
-        self.identefyer = entry_i['flag']
         self.finished_message = entry_i['formattedMessage']
 
-        if int(self.identefyer) == 1: # error
-            self.item_with_color =  QtWidgets.QListWidgetItem(self.finished_message)
-            self.item_with_color.setForeground(QtGui.QColor(255,111,102)) #red
-            self.loglist.addItem(self.item_with_color)
-            filter_list.append(self.finished_message)
-
-        elif int(self.identefyer) == 2: # warning
-            self.item_with_color =  QtWidgets.QListWidgetItem(self.finished_message)
-            self.item_with_color.setForeground(QtGui.QColor(254,134,0)) #orange
-            self.loglist.addItem(self.item_with_color)
-            filter_list.append(self.finished_message)
-
-        elif int(self.identefyer) == 4: # info
-            self.item_with_color =  QtWidgets.QListWidgetItem(self.finished_message)
-            self.item_with_color.setForeground(QtGui.QColor(0,214,0)) #green
-            self.loglist.addItem(self.item_with_color)
-            filter_list.append(self.finished_message)
-
-        elif int(self.identefyer) == 8: # debug
-            self.item_with_color =  QtWidgets.QListWidgetItem(self.finished_message)
-            self.item_with_color.setForeground(QtGui.QColor(1,175,255)) #blue
-            self.loglist.addItem(self.item_with_color)
-            filter_list.append(self.finished_message)
-
-        elif int(self.identefyer) == 16: # verbose
-            self.item_with_color =  QtWidgets.QListWidgetItem(self.finished_message)
-            self.item_with_color.setForeground(QtGui.QColor(198,199,198)) #grey
-            self.loglist.addItem(self.item_with_color)
-            filter_list.append(self.finished_message)
-
-        else:
-            pass
+        fg, bg = self.calcColor(entry_i['flag'])
+        item_with_color = QtWidgets.QListWidgetItem(self.finished_message)
+        item_with_color.setForeground(fg)
+        if bg != None:
+            item_with_color.setBackground(bg)
+        self.loglist.addItem(item_with_color)
 
     #this function is triggerd if a new file is opened.
     def open_file(self):
@@ -158,8 +151,8 @@ class Ui(QtWidgets.QMainWindow):
                         else:
                             pass
                     if len(self.check_list) <= 0:
-                        self.item_with_color =  QtWidgets.QListWidgetItem('Theres NO entry that contains "'+ str(self.search_string) +'"!')
-                        self.item_with_color.setForeground(QtGui.QColor(0,0,0)) #grey
+                        self.item_with_color =  QtWidgets.QListWidgetItem('Theres NO entry that contains"'+ str(self.search_string) +'"!')
+                        self.item_with_color.setForeground(QtGui.QColor(233,233,233)) #grey
                         self.loglist.addItem(self.item_with_color)
                     else:
                         pass
@@ -167,13 +160,35 @@ class Ui(QtWidgets.QMainWindow):
                     pass
             else: 
                 self.item_with_color =  QtWidgets.QListWidgetItem("PLEASE IMPORT A FILE BEFORE SEARCHING!")
-                self.item_with_color.setForeground(QtGui.QColor(255,111,102)) #grey
+                self.item_with_color.setForeground(QtGui.QColor(255,111,102)) #red
                 self.loglist.addItem(self.item_with_color)
         else: 
             pass # ERROR
 
+    #this function is for controling color etc
+    def settings_submit_(self):
+        pass #not included
+
+    # this function is used to process your code :)
     def code_input_submit_(self):
-        print("Hello World!")
+        global entrys
+        global filter_list
+        global path_to_file
+
+        '''
+        if len(sys.argv) != 2:
+            print("Usage: %s <fileToRun>" % "@print('hello world');")
+           sys.exit(1)
+        '''
+
+        self.code_input_ = str(self.code_input.text())
+        
+        if len(self.code_input_) <= 0:
+            print("Something went Wrong!")
+        elif len(self.code_input_) >= 1:
+            run(self.code_input_)
+
+
 
 app = QtWidgets.QApplication(sys.argv)
 window = Ui()
