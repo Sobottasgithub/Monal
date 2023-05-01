@@ -1,0 +1,302 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>Form</class>
+ <widget class="QWidget" name="Form">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>628</width>
+    <height>444</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Form</string>
+  </property>
+  <property name="styleSheet">
+   <string notr="true">background-color: #6D5D6E;
+border-radius: 8px;</string>
+  </property>
+  <widget class="QPushButton" name="close_settigns_button">
+   <property name="geometry">
+    <rect>
+     <x>590</x>
+     <y>10</y>
+     <width>31</width>
+     <height>31</height>
+    </rect>
+   </property>
+   <property name="font">
+    <font>
+     <weight>75</weight>
+     <italic>false</italic>
+     <bold>true</bold>
+     <underline>false</underline>
+     <strikeout>false</strikeout>
+    </font>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">border: 0.5px solid #efefef;
+border-radius: 4px;
+color: #efefef;</string>
+   </property>
+   <property name="text">
+    <string>X</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label">
+   <property name="geometry">
+    <rect>
+     <x>10</x>
+     <y>10</y>
+     <width>171</width>
+     <height>31</height>
+    </rect>
+   </property>
+   <property name="font">
+    <font>
+     <pointsize>16</pointsize>
+     <weight>75</weight>
+     <bold>true</bold>
+    </font>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">color: #efefef;
+background-color: #6D5D6E;</string>
+   </property>
+   <property name="text">
+    <string>SETTINGS</string>
+   </property>
+  </widget>
+  <widget class="QWidget" name="widget" native="true">
+   <property name="geometry">
+    <rect>
+     <x>190</x>
+     <y>30</y>
+     <width>391</width>
+     <height>2</height>
+    </rect>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">background-color: #efefef;</string>
+   </property>
+  </widget>
+  <widget class="QWidget" name="widget_2" native="true">
+   <property name="geometry">
+    <rect>
+     <x>160</x>
+     <y>80</y>
+     <width>460</width>
+     <height>2</height>
+    </rect>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">background-color: #efefef;</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label_2">
+   <property name="geometry">
+    <rect>
+     <x>10</x>
+     <y>70</y>
+     <width>151</width>
+     <height>16</height>
+    </rect>
+   </property>
+   <property name="font">
+    <font>
+     <weight>75</weight>
+     <bold>true</bold>
+    </font>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">color: #efefef;</string>
+   </property>
+   <property name="text">
+    <string>Customize Color</string>
+   </property>
+  </widget>
+  <widget class="QComboBox" name="target_color_to_change">
+   <property name="geometry">
+    <rect>
+     <x>10</x>
+     <y>130</y>
+     <width>211</width>
+     <height>31</height>
+    </rect>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">QComboBox {
+    color: #efefef;
+    font: 14px;
+    padding: 1px 0px 1px 3px; /* This (useless) line resolves a bug with the font color */
+	border: 0.5px solid #efefef;
+	font-weight: bolder;
+}
+
+QComboBox:focus {
+    color: #eeeeff;
+}
+
+QComboBox::drop-down 
+{
+    border: 0px; /* This seems to replace the whole arrow of the combo box */
+}
+
+/* Define a new custom arrow icon for the combo box */
+QComboBox::down-arrow {
+    image: url(Resources/DropDownArrow.png);
+    width: 14px;
+    height: 14px;
+}</string>
+   </property>
+   <item>
+    <property name="text">
+     <string>Background color</string>
+    </property>
+   </item>
+   <item>
+    <property name="text">
+     <string>Nav Background color</string>
+    </property>
+   </item>
+   <item>
+    <property name="text">
+     <string>[INFO] color</string>
+    </property>
+   </item>
+   <item>
+    <property name="text">
+     <string>[VERBOSE] color</string>
+    </property>
+   </item>
+   <item>
+    <property name="text">
+     <string>[ERROR] color</string>
+    </property>
+   </item>
+   <item>
+    <property name="text">
+     <string>[DEBUG] color</string>
+    </property>
+   </item>
+   <item>
+    <property name="text">
+     <string>[WARNING] color</string>
+    </property>
+   </item>
+  </widget>
+  <widget class="QPushButton" name="Submit_color_chosen">
+   <property name="geometry">
+    <rect>
+     <x>440</x>
+     <y>130</y>
+     <width>181</width>
+     <height>31</height>
+    </rect>
+   </property>
+   <property name="font">
+    <font>
+     <pointsize>8</pointsize>
+     <weight>75</weight>
+     <bold>true</bold>
+    </font>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">color: #efefef;
+border: 1px solid #efefef;
+border-radius: 4px;
+</string>
+   </property>
+   <property name="text">
+    <string>Submit Color</string>
+   </property>
+  </widget>
+  <widget class="QLineEdit" name="Submit_color_chosen_input">
+   <property name="geometry">
+    <rect>
+     <x>230</x>
+     <y>130</y>
+     <width>191</width>
+     <height>31</height>
+    </rect>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">color: #efefef;
+border: 1px solid #efefef;
+border-radius: 4px;</string>
+   </property>
+   <property name="placeholderText">
+    <string>#efefef</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label_3">
+   <property name="geometry">
+    <rect>
+     <x>10</x>
+     <y>100</y>
+     <width>201</width>
+     <height>20</height>
+    </rect>
+   </property>
+   <property name="font">
+    <font>
+     <weight>75</weight>
+     <bold>true</bold>
+    </font>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">color: #efefef;</string>
+   </property>
+   <property name="text">
+    <string>Select Target to change</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label_4">
+   <property name="geometry">
+    <rect>
+     <x>234</x>
+     <y>100</y>
+     <width>181</width>
+     <height>20</height>
+    </rect>
+   </property>
+   <property name="font">
+    <font>
+     <weight>75</weight>
+     <bold>true</bold>
+    </font>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">color: #efefef;</string>
+   </property>
+   <property name="text">
+    <string>Enter color! (HEX)</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label_5">
+   <property name="geometry">
+    <rect>
+     <x>450</x>
+     <y>100</y>
+     <width>161</width>
+     <height>20</height>
+    </rect>
+   </property>
+   <property name="font">
+    <font>
+     <weight>75</weight>
+     <bold>true</bold>
+    </font>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">color: #efefef;</string>
+   </property>
+   <property name="text">
+    <string>CHANGE IT!</string>
+   </property>
+  </widget>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>
