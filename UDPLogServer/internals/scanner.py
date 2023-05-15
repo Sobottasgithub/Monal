@@ -1,11 +1,10 @@
 class Token:
-    def __init__(self, kind, value, text, row=0, col=0):
+    def __init__(self, kind, value, text=None, row=0, col=0):
         self.kind = kind
         self.value = value
         self.text = text
         self.row = row
         self.col = col
-        self.text_pos = 0
     
     def __eq__(self, other):
         return other.kind == self.kind and other.value == self.value
@@ -13,27 +12,33 @@ class Token:
     def __str__(self):
         return "Token.%s['%s']" % (self.kind, self.value)
 
+
 class Scanner:
-    def __init__(self, file):
-        self.file = file
+    def __init__(self, text):
+        self.text = text
         self.tokens = []
         self.row = 1
         self.col = 0
         self.state = "start"
         self.buffer = ""
+        self.text_pos = 0
         # this is sensitive to its order (multi char strings should be before its single char counterparts having the same starting char)
         self.multi_specials = (
             ("==", "opTest"),
             ("!=", "opTest"),
             ("<=", "opTest"),
             (">=", "opTest"),
+            ("??", "opTest"),
+            ("?", "opTest"),
             ("(", "LP"),
             (")", "RP"),
             ("+", "opAS"),
             ("-", "opAS"),
             ("*", "opMD"),
             ("/", "opMD"),
+            ("^", "opPow"),
             ("!", "opFac"),
+            ("π", "constVar"),
             ("[", "LSB"),
             ("]", "RSB"),
             ("{", "LCB"),
@@ -43,36 +48,26 @@ class Scanner:
             ("<", "opTest"),
             (">", "opTest"),
             (",", "next"),
+            ("@", "call"),
             (":", "opMap"),
-
-            ("||", "opAssign"), #not included
-            ("&&", "opAssign") #not included
         )
         self.keywords = {
+            "sqrt": "sqrt",
+            "sin": "sin",
+            "let": "let",
+            "if": "if",
+            "else": "else",
+            "elif": "elif",
+            "func": "func",
+            "use": "use",
+            "return": "opRet",
+            "import": "opImport",
+            "from": "from",
             "null": "null",
+            "for": "for",
+            "while": "while",
             "true": "constVar",
             "false": "constVar",
-
-            "fileName" : "constVar", #not included
-            "message" : "constVar", #not included
-            "file": "constVar", #not included
-            "options" : "opident", #not included
-            "timestamp" : "opident", #not included
-            "context" : "opident", #not included
-            "function" : "opident", #not included
-            "threadID" : "opident", #not included
-            "qos" : "opident", #not included
-            "_counter" : "opident", #not included
-            "level" : "opident", #not included
-            "flag" : "opident", #not included
-            "tag" : "opident", #not included
-            "threadName" : "opident", #not included
-            "_processID" : "opident", #not included
-            "queueLabel" : "opident", #not included
-            "line" : "opident", #not included
-            "formattedMessage" : "opident", #not included
-            "contains" : "opident", #not included
-            "startsWith": "opident" #not included
         }
         self.generator = self._generator()      # initialize generator function
     
@@ -81,7 +76,15 @@ class Scanner:
     
     def __next__(self):
         return next(self.generator)             # return next result of generator function
-        
+    
+    def getInputRow(self, row):
+        print(row)
+        try:
+            return self.text.split("\n")[row-1]
+        except IndexError:
+            print("Index doesn't exist!")
+
+    
     def _read(self, num):
         retval = self.text[self.text_pos : self.text_pos + num]
         self.text_pos += num
@@ -231,13 +234,4 @@ class Scanner:
                         continue                        # goto start
                 elif self.state == "text":
                     self.buffer += char
-                    break                               # goto end
-
-
-# TODO: 
-# scanner.py last changes
-# ast.py     programm these things
-# look in the other files and look for mistakes
-# !!!parser.py
-# 1. multi specials
-# 2. keywords
+                    break        
