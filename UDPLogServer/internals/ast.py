@@ -1,14 +1,18 @@
 import math, os
-from .errors import InterpreterError, ReturnFromFunction
+from internals.errors import InterpreterError, ReturnFromFunction
 
 # this class holds all state needed and gets mutated from outside
 class State:
-    def __init__(self):
-        self.varHeap = []
-        self.scope = -1
+    def __init__(self, vars={}):
+        self.varHeap = [vars]
+        self.scope = 0
         self.pushVarScope()
     
+    def __str__(self):
+        return "State(%d, %s)" % (self.scope, str(self.varHeap))
+    
     def pushVarScope(self, scopeDict=None):
+        raise InterpreterError("test")
         if not scopeDict:
             scopeDict = {}
         self.scope += 1
@@ -147,11 +151,11 @@ class Const(AST):
     
     def __str__(self):
         return "%s()" % str(self.__class__.__name__)
-'''
+
 class ConstPi(Const):
     def value(self, flags={}):
         return math.pi
-'''
+
 class ConstTrue(Const):
     def value(self, flags={}):
         return True
@@ -212,7 +216,7 @@ class MapType(AST):
     def __str__(self):
         return "MapType(%s)" % ", ".join(map(str, self.mapList))
     
-'''class OpImport(AST):
+class OpImport(AST):
     def __init__(self, imports, moduleName, token=None):
         self.imports = imports
         self.moduleName = moduleName
@@ -258,7 +262,7 @@ class MapType(AST):
     
     def __str__(self):
         return "OpImport(%s: %s)" % (str(self.moduleName), ", ".join(map(str, ["%s=%s" % (key.value, value) for key, value in self.imports])))
-    '''
+    
 class OpLetFunc(AST):
     def __init__(self, name, subscriptList, argList, useList, definition, token=None):
         self.name = name
@@ -371,6 +375,7 @@ class Var(AST):
     
     def __call__(self, flags={}):
         state = flags["state"]
+        print(state)
         if not state.isSet(self.name):
             self._raiseInterpreterError("Tried to access unset variable '%s'!" % str(self.name))
         value = state.getVar(self.name)
@@ -466,7 +471,7 @@ class OpFor(AST):
     def __str__(self):
         return "OpFor(%s, %s, %s){%s}" % (self.varInit, self.test, self.varInc, self.body)
 
-'''class OpWhile(AST):
+class OpWhile(AST):
     def __init__(self, test, body, token=None):
         self.test = test
         self.body = body
@@ -481,7 +486,7 @@ class OpFor(AST):
     
     def __str__(self):
         return "OpWhile(%s){%s}" % (self.test, self.body)
-'''
+
 class OpIf(AST):
     def __init__(self, test, ast1, ast2, token=None):
         self.test = test
