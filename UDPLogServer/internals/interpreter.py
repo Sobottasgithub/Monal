@@ -16,27 +16,30 @@ def _debug(text):
 def _prefixRow(scanner, row, col):
     inputRow = scanner.getInputRow(row)
     # return empty text and empty padding if the row was empty (e.g. this row won't be printed at all)
-    if inputRow.strip() == "":
-        return ("", "")
-    rowPrefix = "% 4d: " % row
-    indentation = inputRow[:-len(inputRow.lstrip())]
-    padding = indentation + (" " * (col-1-len(indentation)))
-    padding = " " * len(rowPrefix) + padding
-    return ("%s%s" % (rowPrefix, inputRow), padding)
+    if inputRow != None:
+        if inputRow.strip() == "":
+            return ("", "")
+        rowPrefix = "% 4d: " % row
+        indentation = inputRow[:-len(inputRow.lstrip())]
+        padding = indentation + (" " * (col-1-len(indentation)))
+        padding = " " * len(rowPrefix) + padding
+        return ("%s%s" % (rowPrefix, inputRow), padding)
+    else:
+        pass
 
 def _printError(e):
     if not hasattr(e, "already_handled") or not e.already_handled:
         e.already_handled = True
-        print("%s in file '%s' at line %d, column %d: %s" % (
+        print("%s at line %d, column %d: %s" % (
             str(e.__class__.__name__),
-            str(e.token.file),
             e.token.row,
             e.token.col,
             str(str(e)),
         ))
         # if we have a file, create a new scanner and use it to return the line corresponding to our error
-        if e.token.file:
-            scanner = Scanner(e.token.file)
+        if e.token.text:
+            ''' because its just one row
+            scanner = Scanner(e.token.text)
             if e.token.row > 2:
                 (row, padding) = _prefixRow(scanner, e.token.row-1, e.token.col)
                 if row != "":
@@ -47,14 +50,14 @@ def _printError(e):
                 padding,
                 padding,
             ))
-            (row, padding) = _prefixRow(scanner, e.token.row+1, e.token.col)
+            #(row, padding) = _prefixRow(scanner, e.token.row+1, e.token.col)
             if row != "":
-                print(row)
+                print(row)'''
         print("")
         print("Interpreter backtrace:")
     raise e
 
-def run(text, token=None):
+def run(text, entrys, token=None):
     global cache, runList
     try:
         if text in runList:
@@ -77,8 +80,9 @@ def run(text, token=None):
         _debug("Executing...")
         result = None                   # default value for an empty AST
         if ast:
+            print(entrys)
             # run (sub-) module within its own state (only the result can leak into other states via import statements)
-            result = ast({"state": State()})
+            result = ast({"state": State(entrys)})
         _debug("MODULE '%s' RESULT: %s" % (str(text), str(result)))
         cache[text] = result
         runList = runList[:-1]
