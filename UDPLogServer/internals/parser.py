@@ -2,6 +2,7 @@ from .ast import *
 from .scanner import Token
 from .errors import SyntaxError
 
+
 class Parser:
     def __init__(self, scanner):
         self.scanner = scanner
@@ -129,7 +130,10 @@ class Parser:
             ">": OpGt,
             "<=": OpLte,
             ">=": OpGte,
-
+            "??": OpTestIn,
+            "?": OpIsSet,
+            #"and": OpAnd,
+            #"or": OpOr,
         }
         x1 = self.parseAdd()
         if not self.testKind("opTest"):         # possibly raw boolean value --> test for equality with true
@@ -180,7 +184,7 @@ class Parser:
             if not self.testEOT() and (not eotMarker or not self.testKind(eotMarker)):
                 self.accept(argDelimiter)
         return imports
-    '''
+    
     def parseImport(self):
         token = self.accept("opImport")
         importList = self.parseImportList("next", "from")
@@ -188,7 +192,7 @@ class Parser:
         moduleToken = self.accept("id")
         self.accept("EC")
         return OpImport(importList, moduleToken.value, token=token)
-    '''
+    
     def parseFor(self):
         token = self.accept("for")
         self.accept("LP")
@@ -202,7 +206,7 @@ class Parser:
         body = self.parseCommandList("EC", "RCB")
         self.accept("RCB")
         return OpFor(varInit, test, varInc, body, token=token)
-    '''
+    
     def parseWhile(self):
         token = self.accept("while")
         self.accept("LP")
@@ -212,7 +216,7 @@ class Parser:
         body = self.parseCommandList("EC", "RCB")
         self.accept("RCB")
         return OpWhile(test, body, token=token)
-    '''
+    
     def parseLet(self, withLet=True):
         if withLet:
             letToken = self.accept("let")
@@ -338,7 +342,7 @@ class Parser:
             return self.parseMulX(OpPow(heap, x2, token=x1))
         else:                                 # epsilon production
             return heap
-
+    
     #term = term'
     #term = term' "!"
     def parseTerm(self):
@@ -352,6 +356,7 @@ class Parser:
     #term' = "(" add ")"
     def parseTermX(self):
         constVarToASTTable = {
+            "π": ConstPi,
             "true": ConstTrue,
             "false": ConstFalse,
         }
