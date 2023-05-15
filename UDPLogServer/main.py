@@ -1,22 +1,23 @@
 #!/usr/bin/python3
 
-#MONAL LOG VIEWER (MLV)
+# MONAL LOG VIEWER (MLV)
 
-import sys    
-import json   
-import struct 
-import os     
-from PyQt5 import QtWidgets, uic, QtGui, QtCore 
-from internals.interpreter import run 
+import sys
+import json
+import struct
+import os
+from PyQt5 import QtWidgets, uic, QtGui
+from internals.interpreter import run
 
+#global values
 entrys = []
 filter_list = []
 path_to_file = ""
 num_of_settings_window_create = 1
-settings_window_create = None #(settings_submit_)
-color_json_read = None #(setting all colors)
+settings_window_create = None  # (settings_submit_)
+color_json_read = None  # (setting all colors)
 
-#class to make the ui and all functions!
+# class to make the ui and all functions!
 class Main_Ui(QtWidgets.QMainWindow):
     def __init__(self):
         super().__init__()
@@ -24,9 +25,11 @@ class Main_Ui(QtWidgets.QMainWindow):
 
         self.setFixedSize(1400, 840)
 
-        uic.loadUi(os.path.join(os.path.dirname(sys.argv[0]), "ui_files/user_interface.ui"), self)
+        uic.loadUi(os.path.join(os.path.dirname(
+            sys.argv[0]), "ui_files/user_interface.ui"), self)
         self.setWindowTitle("MLV | Monal Log Viewer")
-        self.setWindowIcon(QtGui.QIcon(os.path.join(os.path.dirname(sys.argv[0]), "monal_log_viewer.png")))
+        self.setWindowIcon(QtGui.QIcon(os.path.join(
+            os.path.dirname(sys.argv[0]), "monal_log_viewer.png")))
 
         self.color_json_refresh()
 
@@ -34,55 +37,69 @@ class Main_Ui(QtWidgets.QMainWindow):
         self.open_file_browser.clicked.connect(self.open_file)
         self.search_input_submit.clicked.connect(self.search_input_submit_)
         self.settings_button.clicked.connect(self.settings_submit_)
-        #self.code_input_submit.clicked.connect(self.code_input_submit_) #MLV SQL | Monal Log Viewer Server Query Language
+        self.code_input_submit.clicked.connect(self.code_input_submit_)
 
-        #text-input
+        # text-input
         self.search_input = self.findChild(QtWidgets.QLineEdit, 'search_input')
         self.code_input = self.findChild(QtWidgets.QLineEdit, 'code_input')
 
-    #this codeblock is used to get the colors
+    # this codeblock is used to get the colors
     def color_json_refresh(self):
         global color_json_read
 
-        self.color_json_read_ = open(os.path.join(os.path.dirname(sys.argv[0]), "ui_files/colors.json"), "rb")
+        self.color_json_read_ = open(os.path.join(
+            os.path.dirname(sys.argv[0]), "ui_files/colors.json"), "rb")
         self.color_json_read_ = self.color_json_read_.read()
         self.color_json_read_ = json.loads(str(self.color_json_read_, "UTF-8"))
         color_json_read = self.color_json_read_
 
-        #list background
+        # list background
         self.color_json_read_ = color_json_read['background-color']
-        self.loglist.setStyleSheet("background-color:rgb("+ str(self.color_json_read_[0]) + "," + str(self.color_json_read_[1]) + "," + str(self.color_json_read_[2]) + "); border: 0px solid black;")
-        self.setStyleSheet("background-color:rgb("+ str(self.color_json_read_[0]) + "," + str(self.color_json_read_[1]) + "," + str(self.color_json_read_[2]) + "); color: #efefef;")
+        self.loglist.setStyleSheet("background-color:rgb(" + str(self.color_json_read_[0]) + "," + str(
+            self.color_json_read_[1]) + "," + str(self.color_json_read_[2]) + "); border: 0px solid black;")
+        self.setStyleSheet("background-color:rgb(" + str(self.color_json_read_[0]) + "," + str(
+            self.color_json_read_[1]) + "," + str(self.color_json_read_[2]) + "); color: #efefef;")
 
-        #nav background
+        # nav background
         self.color_json_read_ = color_json_read['nav-background-color']
         if self.color_json_read_ >= [127, 127, 127]:
-            self.widget_2.setStyleSheet("background-color:rgb("+ str(self.color_json_read_[0]) + "," + str(self.color_json_read_[1]) + "," + str(self.color_json_read_[2]) + "); color: #000;")
+            self.widget_2.setStyleSheet("background-color:rgb(" + str(self.color_json_read_[0]) + "," + str(
+                self.color_json_read_[1]) + "," + str(self.color_json_read_[2]) + "); color: #000;")
         else:
-            self.widget_2.setStyleSheet("background-color:rgb("+ str(self.color_json_read_[0]) + "," + str(self.color_json_read_[1]) + "," + str(self.color_json_read_[2]) + "); color: #efefef;")
+            self.widget_2.setStyleSheet("background-color:rgb(" + str(self.color_json_read_[0]) + "," + str(
+                self.color_json_read_[1]) + "," + str(self.color_json_read_[2]) + "); color: #efefef;")
+            
+        self.use_preset_query_drp.clear()
+        self.preset_query_list_app = color_json_read['preset_querys']
+        for i in self.preset_query_list_app:
+            self.use_preset_query_drp.addItem(i)
 
-
-    #a function to give the entrys color
+    # a function to give the entrys color
     def calcColor(self, flag):
         global color_json_read
 
-        if int(flag) == 1: #ERROR
+        if int(flag) == 1:  # ERROR
             self.color_json_read_ = color_json_read['error-color']
-            return (QtGui.QColor(self.color_json_read_[0], self.color_json_read_[1], self.color_json_read_[2]), QtGui.QColor(0, 0, 0)) # red | black
-        elif int(flag) == 2: #WARNING
+            # red | black
+            return (QtGui.QColor(self.color_json_read_[0], self.color_json_read_[1], self.color_json_read_[2]), QtGui.QColor(0, 0, 0))
+        elif int(flag) == 2:  # WARNING
             self.color_json_read_ = color_json_read['warning-color']
-            return (QtGui.QColor(self.color_json_read_[0], self.color_json_read_[1], self.color_json_read_[2]), QtGui.QColor(0, 0, 0)) # orange | black
-        elif int(flag) == 4: #INFO
+            # orange | black
+            return (QtGui.QColor(self.color_json_read_[0], self.color_json_read_[1], self.color_json_read_[2]), QtGui.QColor(0, 0, 0))
+        elif int(flag) == 4:  # INFO
             self.color_json_read_ = color_json_read['info-color']
-            return (QtGui.QColor(self.color_json_read_[0], self.color_json_read_[1], self.color_json_read_[2]), None) # green | white
-        elif int(flag) == 8: #DEBUG
+            # green | white
+            return (QtGui.QColor(self.color_json_read_[0], self.color_json_read_[1], self.color_json_read_[2]), None)
+        elif int(flag) == 8:  # DEBUG
             self.color_json_read_ = color_json_read['debug-color']
-            return (QtGui.QColor(self.color_json_read_[0], self.color_json_read_[1], self.color_json_read_[2]), None) # blue | white
-        elif int (flag) == 16: #VERBOSE
+            # blue | white
+            return (QtGui.QColor(self.color_json_read_[0], self.color_json_read_[1], self.color_json_read_[2]), None)
+        elif int(flag) == 16:  # VERBOSE
             self.color_json_read_ = color_json_read['verbose-color']
-            return (QtGui.QColor(self.color_json_read_[0], self.color_json_read_[1], self.color_json_read_[2]), None) # grey | white
+            # grey | white
+            return (QtGui.QColor(self.color_json_read_[0], self.color_json_read_[1], self.color_json_read_[2]), None)
 
-    #This function filters all entrys that are written in the listview
+    # This function filters all entrys that are written in the listview
     def filter_color_and_display(self, entry_i):
         global entrys
         global filter_list
@@ -96,8 +113,9 @@ class Main_Ui(QtWidgets.QMainWindow):
         if bg != None:
             item_with_color.setBackground(bg)
         self.loglist.addItem(item_with_color)
+        filter_list.append(item_with_color)
 
-    #this function is triggerd if a new file is opened.
+    # this function is triggerd if a new file is opened.
     def open_file(self):
         global entrys
         global filter_list
@@ -109,13 +127,13 @@ class Main_Ui(QtWidgets.QMainWindow):
         self.color_json_refresh()
 
         # Open file Browser
-        file , check = QtWidgets.QFileDialog.getOpenFileName(None, "MLV | Choose a Logfile",
-                            "", "Raw Log (*.rawlog)")
-        
+        file, check = QtWidgets.QFileDialog.getOpenFileName(None, "MLV | Choose a Logfile",
+                                                            "", "Raw Log (*.rawlog)")
+
         if check:
             path_to_file = str(file)
 
-            #progress bar
+            # progress bar
             self.completed = 0
             self.percent = 0
             with open(path_to_file, 'r') as fp:
@@ -124,15 +142,15 @@ class Main_Ui(QtWidgets.QMainWindow):
             self.percent = self.percent / 19
             self.percent = round((1 * self.percent) / 100)
 
-            #real logviewer part
-            logfile_open = open(path_to_file, "rb") # open log
+            # real logviewer part
+            logfile_open = open(path_to_file, "rb")  # open log
 
             self.progress = QtWidgets.QProgressBar(self)
-            self.progress.setGeometry(0, 120, 1415, 40)
+            self.progress.setGeometry(0, 160, 1415, 40)
             self.progress.show()
 
             while True:
-                #Unpacks the rawlog file and strips down the values
+                # Unpacks the rawlog file and strips down the values
                 acht_bytes = logfile_open.read(8)
                 if len(acht_bytes) != 8:
                     break
@@ -148,7 +166,7 @@ class Main_Ui(QtWidgets.QMainWindow):
 
                 self.completed += self.percent
                 self.progress.setValue(self.completed)
-            
+
             self.progress.hide()
             self.progress.setValue(0)
 
@@ -163,7 +181,7 @@ class Main_Ui(QtWidgets.QMainWindow):
         global path_to_file
 
         self.lower_or_uppercase = self.lower_uper_case_switch.isChecked()
-    
+
         self.check_list = []
 
         self.loglist.clear()
@@ -181,26 +199,29 @@ class Main_Ui(QtWidgets.QMainWindow):
                         self.containing_message = self.containing_message.lower()
 
                         if self.search_string in self.containing_message:
-                                self.filter_color_and_display(self.entry_index)
-                                self.check_list.append(" ")
+                            self.filter_color_and_display(self.entry_index)
+                            self.check_list.append(" ")
                         else:
                             pass
                     if len(self.check_list) <= 0:
-                        self.item_with_color =  QtWidgets.QListWidgetItem('Theres NO entry that contains "'+ str(self.search_string) +'"!')
-                        self.item_with_color.setForeground(QtGui.QColor(255,255,255)) #grey
+                        self.item_with_color = QtWidgets.QListWidgetItem(
+                            'Theres NO entry that contains "' + str(self.search_string) + '"!')
+                        self.item_with_color.setForeground(
+                            QtGui.QColor(255, 255, 255))  # grey
                         self.loglist.addItem(self.item_with_color)
 
-                        # filter_list.append(self.finished_message)
                     else:
-                        pass
+                        pass  # error
                 else:
-                    pass
-            else: 
-                self.item_with_color =  QtWidgets.QListWidgetItem("PLEASE IMPORT A FILE BEFORE SEARCHING!")
-                self.item_with_color.setForeground(QtGui.QColor(255,111,102)) #grey
+                    pass  # error
+            else:
+                self.item_with_color = QtWidgets.QListWidgetItem(
+                    "PLEASE IMPORT A FILE BEFORE SEARCHING!")
+                self.item_with_color.setForeground(
+                    QtGui.QColor(255, 111, 102))  # grey
                 self.loglist.addItem(self.item_with_color)
 
-        elif self.lower_or_uppercase == False: # everything like it used to be
+        elif self.lower_or_uppercase == False:  # everything like it used to be
             if entrys != None and entrys != []:
                 if self.search_string != None:
                     for i in range(len(entrys)):
@@ -208,125 +229,151 @@ class Main_Ui(QtWidgets.QMainWindow):
                         self.containing_message = self.entry_index['formattedMessage']
 
                         if self.search_string in self.containing_message:
-                                self.filter_color_and_display(self.entry_index)
-                                self.check_list.append(" ")
+                            self.filter_color_and_display(self.entry_index)
+                            self.check_list.append(" ")
                         else:
                             pass
                     if len(self.check_list) <= 0:
-                        self.item_with_color =  QtWidgets.QListWidgetItem('Theres NO entry that contains"'+ str(self.search_string) +'"!')
-                        self.item_with_color.setForeground(QtGui.QColor(233,233,233)) #grey
+                        self.item_with_color = QtWidgets.QListWidgetItem(
+                            'Theres NO entry that contains"' + str(self.search_string) + '"!')
+                        self.item_with_color.setForeground(
+                            QtGui.QColor(233, 233, 233))  # grey
                         self.loglist.addItem(self.item_with_color)
                     else:
                         pass
                 else:
                     pass
-            else: 
-                self.item_with_color =  QtWidgets.QListWidgetItem("PLEASE IMPORT A FILE BEFORE SEARCHING!")
-                self.item_with_color.setForeground(QtGui.QColor(255,111,102)) #red
+            else:
+                self.item_with_color = QtWidgets.QListWidgetItem(
+                    "PLEASE IMPORT A FILE BEFORE SEARCHING!")
+                self.item_with_color.setForeground(
+                    QtGui.QColor(255, 111, 102))  # red
                 self.loglist.addItem(self.item_with_color)
-        else: 
-            pass # ERROR
+        else:
+            pass  # ERROR
 
-    #a function to create labels where and how you want 
+    # a function to create labels where and how you want
     def create_status_label_status(self, message, where, y, x):
-            global settings_window_create
-            where.color_status_label = QtWidgets.QLabel(where)
-            where.color_status_label.setText(message)
-            where.color_status_label.move(x, y)
-            where.color_status_label.show()
+        global settings_window_create
 
-    #a function to get color input and change it!
+        where.color_status_label = QtWidgets.QLabel(where)
+        where.color_status_label.setText(message)
+        where.color_status_label.move(x, y)
+        where.color_status_label.show()
+
+    # a function to get color input and change it!
     def Submit_color_chosen_(self):
         global settings_window_create
         global color_json_read
 
-        settings_window_create.color_input = str(settings_window_create.Submit_color_chosen_input.text()) #get color to change to
-        settings_window_create.combobox_value_color = str(settings_window_create.target_color_to_change.currentText()) #get item to change
+        settings_window_create.color_input = str(
+            settings_window_create.Submit_color_chosen_input.text())  # get color to change to
+        settings_window_create.combobox_value_color = str(
+            settings_window_create.target_color_to_change.currentText())  # get item to change
 
         if len(settings_window_create.color_input) == 7 and settings_window_create.color_input.startswith('#'):
-            #settings_window_create.combobox_value_color 
+            # settings_window_create.combobox_value_color
             settings_window_create.color_input = settings_window_create.color_input[1:]
-            settings_window_create.rgb_value = list(int(settings_window_create.color_input[i:i+2], 16) for i in (0, 2, 4))
+            settings_window_create.rgb_value = list(
+                int(settings_window_create.color_input[i:i+2], 16) for i in (0, 2, 4))
 
-            colors_MAIN = {
-                "background-color" : [57,54,70],
-                "nav-background-color": [109,93,110],
-                "info-color" : [0,214,0],
-                "verbose-color" : [148,149,149],
-                "error-color" : [255,111,102],
-                "debug-color" : [1,175,255],
-                "warning-color" :[254,134,0],
-            }
+            with open(os.path.join(os.path.dirname(sys.argv[0]), "ui_files/colors.json"), "r") as jsonFile:
+                self.data = json.load(jsonFile)
 
-            #sync colors
-            colors_MAIN['background-color'] = color_json_read['background-color']
-            colors_MAIN['nav-background-color'] = color_json_read['nav-background-color'] 
-            colors_MAIN['info-color'] = color_json_read['info-color'] 
-            colors_MAIN['verbose-color'] = color_json_read['verbose-color'] 
-            colors_MAIN['error-color'] = color_json_read['error-color'] 
-            colors_MAIN['debug-color'] = color_json_read['debug-color']
-            colors_MAIN['warning-color'] = color_json_read['warning-color']
-            
-            #asign changed value
+            # asign changed value
             if settings_window_create.combobox_value_color == "Background color":
-                colors_MAIN['background-color'] = settings_window_create.rgb_value
+                self.data['background-color'] = settings_window_create.rgb_value
             elif settings_window_create.combobox_value_color == "Nav Background color":
-                colors_MAIN["nav-background-color"] = settings_window_create.rgb_value
+                self.data["nav-background-color"] = settings_window_create.rgb_value
             elif settings_window_create.combobox_value_color == "[INFO] color":
-                colors_MAIN['info-color'] = settings_window_create.rgb_value
+                self.data['info-color'] = settings_window_create.rgb_value
             elif settings_window_create.combobox_value_color == "[VERBOSE] color":
-                colors_MAIN['verbose-color'] = settings_window_create.rgb_value
+                self.data['verbose-color'] = settings_window_create.rgb_value
             elif settings_window_create.combobox_value_color == "[ERROR] color":
-                colors_MAIN['error-color'] = settings_window_create.rgb_value
+                self.data['error-color'] = settings_window_create.rgb_value
             elif settings_window_create.combobox_value_color == "[DEBUG] color":
-                colors_MAIN['debug-color'] = settings_window_create.rgb_value
+                self.data['debug-color'] = settings_window_create.rgb_value
             elif settings_window_create.combobox_value_color == "[WARNING] color":
-                colors_MAIN['warning-color'] = settings_window_create.rgb_value
+                self.data['warning-color'] = settings_window_create.rgb_value
             else:
                 print("ERROR 321")
 
-            json_object = json.dumps(colors_MAIN, indent=6)
-
-            with open(os.path.join(os.path.dirname(sys.argv[0]), "ui_files/colors.json"), "w") as outfile:
-                outfile.write(json_object)
+            with open(os.path.join(os.path.dirname(sys.argv[0]), "ui_files/colors.json"), "w") as jsonFile:
+                json.dump(self.data, jsonFile)
 
             #status (successfull)
-            self.create_status_label_status("Successfully changed!", settings_window_create, 60, 160)
+            self.create_status_label_status(
+                "Successfully changed!", settings_window_create, 60, 160)
 
         else:
             #status (unsuccessfull)
-            self.create_status_label_status("Something went wrong!", settings_window_create, 60, 160)
-            print("ERROR 320") #build error/num error
+            self.create_status_label_status(
+                "Something went wrong!", settings_window_create, 60, 160)
+            print("ERROR 320")  # build error/num error
 
         self.color_json_refresh()
+    
+    #A function that writes a new query in a json file
+    def preset_submit_query_(self):
+        global settings_window_create
 
-    #this function is for controling color etc
-    @QtCore.pyqtSlot()
-    def settings_submit_(self):   
+        settings_window_create.query_input = str(
+            settings_window_create.preset_query_input.text())  # get query
+        
+        if len(settings_window_create.query_input) >= 0:
+            with open(os.path.join(os.path.dirname(sys.argv[0]), "ui_files/colors.json"), "r") as jsonFile:
+                self.data = json.load(jsonFile)
+
+                self.preset_query_list = self.data["preset_querys"]
+                self.preset_query_list.append(settings_window_create.query_input)
+                self.data["preset_querys"]  = self.preset_query_list
+
+            with open(os.path.join(os.path.dirname(sys.argv[0]), "ui_files/colors.json"), "w") as jsonFile:
+                json.dump(self.data, jsonFile)
+                #status (successfull)
+                self.create_status_label_status(
+                    "Added succesfully!", settings_window_create, 270, 160)
+
+        else:
+            #status (unsuccessfull)
+            self.create_status_label_status(
+                "Something went wrong!", settings_window_create, 270, 160)
+
+
+    # this function is for controling color etc
+    def settings_submit_(self):
         global num_of_settings_window_create
         global settings_window_create
 
         if num_of_settings_window_create == 1:
-                settings_window_create = QtWidgets.QWidget(self)
-                settings_window_create.setGeometry(400,200,400,200)
-                settings_window_create.setStyleSheet("border-radius: 4px; background-color: #efefef;")
-                
-                uifile_ = os.path.join(os.path.dirname(sys.argv[0]), "ui_files/settings.ui")
-                uic.loadUi(uifile_, settings_window_create)
+            settings_window_create = QtWidgets.QWidget(self)
+            settings_window_create.setGeometry(400, 200, 400, 200)
+            settings_window_create.setStyleSheet(
+                "border-radius: 4px; background-color: #efefef;")
 
-                settings_window_create.close_settigns_button.clicked.connect(self.settings_submit_) #X button
-                settings_window_create.Submit_color_chosen.clicked.connect(self.Submit_color_chosen_) #color submit button
+            uifile_ = os.path.join(os.path.dirname(
+                sys.argv[0]), "ui_files/settings.ui")
+            uic.loadUi(uifile_, settings_window_create)
 
-                settings_window_create.color_input = settings_window_create.findChild(QtWidgets.QLineEdit, 'Submit_color_chosen_input')
+            settings_window_create.close_settigns_button.clicked.connect(
+                self.settings_submit_)  # X button
+            settings_window_create.Submit_color_chosen.clicked.connect(
+                self.Submit_color_chosen_)  # color submit button
+            settings_window_create.submit_query.clicked.connect(
+                self.preset_submit_query_) #query submit button
 
+            settings_window_create.color_input = settings_window_create.findChild(
+                QtWidgets.QLineEdit, 'Submit_color_chosen_input')
+            settings_window_create.preset_query_input = settings_window_create.findChild(
+                QtWidgets.QLineEdit, 'query_preset_input')
 
-                self.create_status_label_status("Background color: "+str(color_json_read['background-color'])+"; Nav Background color: "+str(color_json_read['nav-background-color'])+";", settings_window_create, 180, 10)
-                self.create_status_label_status("[VERBOSE] color: "+str(color_json_read['verbose-color'])+";  [INFO] color: "+str(color_json_read['info-color'])+";",  settings_window_create, 200, 10)
-                self.create_status_label_status("[WARNING] color: "+str(color_json_read['warning-color'])+";  [ERROR] color: "+str(color_json_read['error-color']) +";",  settings_window_create, 220, 10)
-                self.create_status_label_status("[DEBUG] color: "+str(color_json_read['debug-color'])+"; (in RGB)", settings_window_create, 240, 10)
+            self.create_status_label_status("Background color: "+str(color_json_read['background-color'])+"; Nav Background color: "+str(color_json_read['nav-background-color'])+";", settings_window_create, 180, 10)
+            self.create_status_label_status("[VERBOSE] color: "+str(color_json_read['verbose-color']) + ";  [INFO] color: "+str(color_json_read['info-color'])+";",  settings_window_create, 200, 10)
+            self.create_status_label_status("[WARNING] color: "+str(color_json_read['warning-color'])+";  [ERROR] color: "+str(color_json_read['error-color']) + ";",  settings_window_create, 220, 10)
+            self.create_status_label_status("[DEBUG] color: "+str(color_json_read['debug-color'])+"; (RGB)", settings_window_create, 240, 10)
 
-                settings_window_create.show()
-                num_of_settings_window_create += 1
+            settings_window_create.show()
+            num_of_settings_window_create += 1
 
         elif num_of_settings_window_create == 2:
             settings_window_create.hide()
@@ -335,28 +382,37 @@ class Main_Ui(QtWidgets.QMainWindow):
             num_of_settings_window_create -= 1
 
         else:
-            print("ERROR 320") #build error/num error
+            print("ERROR 320")  # build error/num error
 
     # this function is used to process your code :)
-    def code_input_submit_(self): #NOT FINISHED
+    def code_input_submit_(self):
         global entrys
         global filter_list
         global path_to_file
 
-        '''
-        if len(sys.argv) != 2:
-            print("Usage: %s <fileToRun>" % "@print('hello world');")
-           sys.exit(1)
-        '''
-
         self.code_input_ = str(self.code_input.text())
-        
-        if len(self.code_input_) <= 0:
-            print("Something went Wrong!")
-        elif len(self.code_input_) >= 1:
-            run(self.code_input_)
 
-#mainapp run
+        self.use_preset_query_checkbox_ = self.use_preset_query_checkbox.isChecked()
+        self.use_own_query_checkbox_ = self.use_own_query_checkbox.isChecked()
+        self.use_preset_query_drp_ = str(self.use_preset_query_drp.currentText())
+
+        self.cons = [self.use_own_query_checkbox_ == True, self.use_preset_query_checkbox_ == True]
+
+        
+        if 1 == sum(map(bool, self.cons)) < 2:
+            if self.use_own_query_checkbox_ == True and len(self.code_input_) >= 1: ##
+                for i in range(len(entrys)):
+                    print(entrys[i])
+                    self.return_val = run(self.code_input_, entrys[i])
+                    filter_list[i].setHidden(True)
+
+            elif self.use_preset_query_checkbox_ == True and len(self.use_preset_query_drp_) >= 1:
+                for i in range(len(entrys)):
+                    print(entrys[i])
+                    self.return_val = run(self.code_input_, entrys[i])
+                    filter_list[i].setHidden(True)
+        
+# mainapp run
 application_run = QtWidgets.QApplication(sys.argv)
 Main_application = Main_Ui()
 Main_application.show()
