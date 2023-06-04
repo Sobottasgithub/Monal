@@ -4,15 +4,16 @@ from internals.errors import InterpreterError, ReturnFromFunction
 # this class holds all state needed and gets mutated from outside
 class State:
     def __init__(self, vars={}):
-        self.varHeap = [vars]
-        self.scope = 0
+        self.varHeap = []
+        self.scope = -1
         self.pushVarScope()
+        for k in vars:
+            self.setVar(k, vars[k])
     
     def __str__(self):
         return "State(%d, %s)" % (self.scope, str(self.varHeap))
     
     def pushVarScope(self, scopeDict=None):
-        raise InterpreterError("test")
         if not scopeDict:
             scopeDict = {}
         self.scope += 1
@@ -155,6 +156,26 @@ class Const(AST):
 class ConstPi(Const):
     def value(self, flags={}):
         return math.pi
+
+class ConstFlagError(Const):
+    def value(self, flags={}):
+        return 1
+    
+class ConstFlagWarning(Const):
+    def value(self, flags={}):
+        return 2
+    
+class ConstFlagInfo(Const):
+    def value(self, flags={}):
+        return 4
+
+class ConstFlagDebug(Const):
+    def value(self, flags={}):
+        return 8
+    
+class ConstFlagVerbose(Const):
+    def value(self, flags={}):
+        return 16
 
 class ConstTrue(Const):
     def value(self, flags={}):

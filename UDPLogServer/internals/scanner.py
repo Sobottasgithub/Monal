@@ -24,6 +24,11 @@ class Scanner:
         self.text_pos = 0
         # this is sensitive to its order (multi char strings should be before its single char counterparts having the same starting char)
         self.multi_specials = (
+            ("ERROR", "constVar"),
+            ("WARNING", "constVar"),
+            ("INFO", "constVar"),
+            ("DEBUG", "constVar"),
+            ("VERBOSE", "constVar"),
             ("==", "opTest"),
             ("!=", "opTest"),
             ("<=", "opTest"),

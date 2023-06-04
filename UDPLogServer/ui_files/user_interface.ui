@@ -239,19 +239,25 @@ height: 1.5em;</string>
             <rect>
              <x>150</x>
              <y>10</y>
-             <width>900</width>
+             <width>1080</width>
              <height>36</height>
             </rect>
            </property>
            <property name="maximumSize">
             <size>
-             <width>900</width>
+             <width>1080</width>
              <height>36</height>
             </size>
            </property>
            <property name="styleSheet">
             <string notr="true">border: 1px solid #efefef;
 border-radius: 4px;</string>
+           </property>
+           <property name="maxLength">
+            <number>33767</number>
+           </property>
+           <property name="frame">
+            <bool>false</bool>
            </property>
            <property name="placeholderText">
             <string>enter query...</string>
@@ -262,7 +268,7 @@ border-radius: 4px;</string>
             <rect>
              <x>150</x>
              <y>60</y>
-             <width>900</width>
+             <width>1080</width>
              <height>36</height>
             </rect>
            </property>
@@ -291,32 +297,11 @@ QComboBox::down-arrow {
     height: 14px;
 }</string>
            </property>
-          </widget>
-          <widget class="QCheckBox" name="use_own_query_checkbox">
-           <property name="geometry">
-            <rect>
-             <x>1070</x>
-             <y>20</y>
-             <width>161</width>
-             <height>21</height>
-            </rect>
-           </property>
-           <property name="text">
-            <string>use own query</string>
-           </property>
-          </widget>
-          <widget class="QCheckBox" name="use_preset_query_checkbox">
-           <property name="geometry">
-            <rect>
-             <x>1070</x>
-             <y>70</y>
-             <width>161</width>
-             <height>21</height>
-            </rect>
-           </property>
-           <property name="text">
-            <string>use preset query</string>
-           </property>
+           <item>
+            <property name="text">
+             <string>Choose a query...</string>
+            </property>
+           </item>
           </widget>
          </widget>
         </item>

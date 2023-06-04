@@ -80,7 +80,6 @@ def run(text, entrys, token=None):
         _debug("Executing...")
         result = None                   # default value for an empty AST
         if ast:
-            print(entrys)
             # run (sub-) module within its own state (only the result can leak into other states via import statements)
             result = ast({"state": State(entrys)})
         _debug("MODULE '%s' RESULT: %s" % (str(text), str(result)))

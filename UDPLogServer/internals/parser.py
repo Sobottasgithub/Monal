@@ -359,6 +359,11 @@ class Parser:
             "π": ConstPi,
             "true": ConstTrue,
             "false": ConstFalse,
+            "ERROR": ConstFlagError,
+            "WARNING": ConstFlagWarning,
+            "INFO": ConstFlagInfo,
+            "DEBUG": ConstFlagDebug,
+            "VERBOSE": ConstFlagVerbose,
         }
         if self.testKind("LP"):
             self.acceptIt()
